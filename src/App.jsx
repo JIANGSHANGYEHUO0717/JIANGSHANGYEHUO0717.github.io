@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArchiveFieldStage } from "./ArchiveFieldStage.jsx";
 import { preloadArchiveModels } from "./archiveAssets.js";
+import { preloadObservationModel } from "./observationAssets.js";
+import { preloadSpecimenModel } from "./specimenAssets.js";
 import { SpecimenStage } from "./SpecimenStage.jsx";
 import { OrganismStage } from "./OrganismStage.jsx";
 import { ArchiveInterface, ObservationInterface } from "./InterfaceChrome.jsx";
@@ -187,6 +189,23 @@ export function App() {
     if (terrainStudy) return;
     preloadArchiveModels().catch(() => {});
   }, [terrainStudy]);
+
+  useEffect(() => {
+    if (terrainStudy || !archive.ready) return undefined;
+    const preload = () => {
+      Promise.allSettled([
+        ...["C01", "C02", "C03", "C05"].map(preloadObservationModel),
+        preloadSpecimenModel(),
+        input.preloadModels(),
+      ]);
+    };
+    if ("requestIdleCallback" in window) {
+      const idleId = window.requestIdleCallback(preload, { timeout: 1600 });
+      return () => window.cancelIdleCallback(idleId);
+    }
+    const timer = window.setTimeout(preload, 650);
+    return () => window.clearTimeout(timer);
+  }, [archive.ready, input.preloadModels, terrainStudy]);
 
   useEffect(() => {
     if (screen !== "entering" || !entryReady) return undefined;

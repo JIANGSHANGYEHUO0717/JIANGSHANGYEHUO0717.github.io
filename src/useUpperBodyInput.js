@@ -330,6 +330,11 @@ export function useUpperBodyInput({ poseOnly = false, inputKind = "default" } = 
     if (session === sessionRef.current && modeRef.current === "idle") startCamera();
   }, [startCamera]);
 
+  const preloadModels = useCallback(() => Promise.all([
+    preparePoseModel(),
+    poseOnlyRef.current ? Promise.resolve(null) : prepareHandModel(),
+  ]), [prepareHandModel, preparePoseModel]);
+
   const returnToIdle = useCallback(() => {
     stop();
     modeRef.current = "idle";
@@ -355,5 +360,5 @@ export function useUpperBodyInput({ poseOnly = false, inputKind = "default" } = 
   }, [stop, changeCameraPhase]);
 
   return { mode, status, detail, signal, points, dualPinch, c03RightHand, calibration, fps, videoRef, startDemo, startCamera, stop, returnToIdle,
-    simulateHand, handDetail, handModelStatus, cameraPhase, cameraError, handVisible, resumeCamera, permissionPhase, requestCameraPermission };
+    simulateHand, handDetail, handModelStatus, cameraPhase, cameraError, handVisible, resumeCamera, preloadModels, permissionPhase, requestCameraPermission };
 }
