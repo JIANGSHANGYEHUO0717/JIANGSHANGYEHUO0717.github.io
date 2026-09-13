@@ -1,0 +1,22 @@
+{
+  "name": "p1-category4-prototype",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/prepare-sites-build.mjs",
+    "preview": "vite preview",
+    "test:sites": "node --test tests/sites-worker.test.mjs",
+    "test:c02": "node --test tests/c02-surface-routing.test.mjs",
+    "test:interactions": "node --test tests/interaction-arbitration.test.mjs"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^1.0.1",
+    "@vitejs/plugin-react": "5.0.4",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "three": "^0.179.1",
+    "vite": "6.4.2"
+  }
+}
