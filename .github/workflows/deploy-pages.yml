@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build website
-        run: npm run build
+        run: npx vite build
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
