@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArchiveFieldStage } from "./ArchiveFieldStage.jsx";
-import { preloadArchiveReturn } from "./archiveReturn.js";
 import { preloadArchiveModels } from "./archiveAssets.js";
-import { preloadSpecimenModel } from "./specimenAssets.js";
 import { SpecimenStage } from "./SpecimenStage.jsx";
 import { OrganismStage } from "./OrganismStage.jsx";
 import { ArchiveInterface, ObservationInterface } from "./InterfaceChrome.jsx";
@@ -44,9 +42,12 @@ function DebugTools({ screen, setScreen, archive, resetArchive, input }) {
 function ArchiveScreen({ archive, sessionRef, onInteractionChange, resetKey, onReadyChange, lang, onLanguageChange, transitioning = false, transitionReady = false, entering = false, entryReady = false, entryError = "" }) {
   return (
     <section className={`archive-screen${transitioning ? " transition-underlay" : ""}${transitionReady ? " transition-ready" : ""}${entering ? " archive-entry-source" : ""}${entering && entryReady ? " entry-ready" : ""}`} inert={entering || transitioning ? true : undefined} aria-label="生态档案，五个生命信号">
+      <img className={`archive-poster${archive.ready ? " is-ready" : ""}`} src="/archive-poster.png" alt="" aria-hidden="true" fetchPriority="high" />
       <ArchiveFieldStage sessionRef={sessionRef} frozen={entering || transitioning} hideOrganisms={transitioning} resetKey={resetKey} onInteractionChange={onInteractionChange} onReadyChange={onReadyChange} lang={lang} />
-      <ArchiveInterface archive={archive} lang={lang} onLanguageChange={onLanguageChange} />
-      {!archive.ready && <div className="archive-loading">{lang==="en"?"READING LIFE SIGNALS":"正在读取生命体"}</div>}
+      <div className={`archive-live-interface${archive.ready ? " is-ready" : ""}`}>
+        <ArchiveInterface archive={archive} lang={lang} onLanguageChange={onLanguageChange} />
+      </div>
+      {!archive.ready && <div className="archive-loading">{lang==="en"?"INITIALIZING ARCHIVE":"正在连接生态档案"}</div>}
       {entryError && <div className="archive-loading" role="alert">{lang==="en"?"SPECIMEN UNAVAILABLE — SELECT AGAIN":entryError}</div>}
       {ORGANISM_CATALOG.map(organism => <button key={organism.id} className="archive-keyboard-entry" disabled={!archive.ready || entering || transitioning} onClick={() => onInteractionChange({ phase: "clicked", id: organism.id })}>{lang==="en"?`OBSERVE ${organism.id}`:`进入${organism.category}观测`}</button>)}
     </section>
@@ -185,8 +186,6 @@ export function App() {
   useEffect(() => {
     if (terrainStudy) return;
     preloadArchiveModels().catch(() => {});
-    preloadArchiveReturn().catch(() => {});
-    preloadSpecimenModel().catch(() => {});
   }, [terrainStudy]);
 
   useEffect(() => {
